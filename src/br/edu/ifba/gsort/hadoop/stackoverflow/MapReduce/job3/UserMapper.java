@@ -36,7 +36,7 @@ public class UserMapper extends Mapper<Object, Text, Text, Text> {
 		String val = "[SINGUP]";
 		
 		outkey.set(userId + ano);
-		outvalue.set("A" + displayName.toString() +"[" +ano + "]"+  Utill.SEPARADOR + val);
+		outvalue.set("A" + +userId + Utill.SEPARADOR  + displayName.toString() +"[" +ano + "]"+  Utill.SEPARADOR + val);
 		context.write(outkey, outvalue);
 	}
 }
