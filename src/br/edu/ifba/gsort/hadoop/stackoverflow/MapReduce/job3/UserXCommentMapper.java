@@ -22,32 +22,32 @@ public class UserXCommentMapper extends Mapper<Object, Text, Text, Text> {
 			throws IOException, InterruptedException {
 
 		Map<String, String> parsed = Utill.transformXmlToMap(value.toString());
-		//2010-05-28T13:43:13.617
-		
+
 
 		String userId = parsed.get("UserId");
 		String creationDate = parsed.get("CreationDate");
 		String commentId = parsed.get("Id");
-		String dia = null;
+		String ano = null;
 		
 		if (userId == null || commentId == null || creationDate == null) {
 			return;
 		}
 
-		DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
-		DateFormat format2 = new SimpleDateFormat("yyyy");
-		try {
-			Date data = format.parse(creationDate);
-			dia = format2.format(data);
-		} catch (ParseException e) {
+		if (Utill.filterIsEmptyNullable(userId,commentId,creationDate)) {
 			return;
 		}
 		
-		String val = ":: COMMENTED: " + commentId;
+		ano = Utill.getYear(creationDate);
 		
+		if (Utill.filterIsEmptyNullable(ano)){
+			return;
+		}
+		String val = "[COMMENTED]" + commentId;
 		
-		outkey.set(dia +"\t"+userId);
-		outvalue.set(val);
+
+
+		outkey.set(userId + ano);
+		outvalue.set("C" +val);
 		context.write(outkey, outvalue);
 	}
 

@@ -3,19 +3,20 @@ package br.edu.ifba.gsort.hadoop.stackoverflow.MapReduce.job1;
 import java.io.IOException;
 import java.util.Map;
 
+import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
 import br.edu.ifba.gsort.hadoop.common.Utill;
 
-public class UserMapper extends Mapper<Object, Text, Text, Text> {
+public class UserFilteringMapper extends Mapper<Object, Text, NullWritable, Text> {
 
 	private Text outUserId = new Text();
 	
 
 	@Override
 	protected void setup(
-			Mapper<Object, Text, Text, Text>.Context context)
+			Mapper<Object, Text, NullWritable, Text>.Context context)
 			throws IOException, InterruptedException {
 		super.setup(context);
 	}
@@ -37,7 +38,7 @@ public class UserMapper extends Mapper<Object, Text, Text, Text> {
 			return;
 		}
 		outUserId.set(userId);
-		context.write(outUserId, new Text(displayName + "::" + location));
+		context.write(NullWritable.get(), value);
 	}
 
 

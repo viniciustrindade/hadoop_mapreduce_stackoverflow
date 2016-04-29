@@ -5,27 +5,26 @@ import java.io.IOException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.MultipleInputs;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
-import br.edu.ifba.gsort.hadoop.stackoverflow.MapReduce.job1.UserMapper;
+import br.edu.ifba.gsort.hadoop.stackoverflow.MapReduce.job1.UserFilteringMapper;
 import br.edu.ifba.gsort.hadoop.stackoverflow.MapReduce.job2.JoinPostMapper;
 import br.edu.ifba.gsort.hadoop.stackoverflow.MapReduce.job2.JoinUserMapper;
 import br.edu.ifba.gsort.hadoop.stackoverflow.MapReduce.job2.JoinUserPostReducer;
+import br.edu.ifba.gsort.hadoop.stackoverflow.MapReduce.job3.UserHistoryReducer;
+import br.edu.ifba.gsort.hadoop.stackoverflow.MapReduce.job3.UserMapper;
 import br.edu.ifba.gsort.hadoop.stackoverflow.MapReduce.job3.UserXBadgesMapper;
 import br.edu.ifba.gsort.hadoop.stackoverflow.MapReduce.job3.UserXCommentMapper;
 import br.edu.ifba.gsort.hadoop.stackoverflow.MapReduce.job3.UserXPostMapper;
 
 public class Main {
 
-	public static void main(String[] args) throws IOException,
-			InterruptedException, ClassNotFoundException {
+	public static void main(String[] args) throws IOException, InterruptedException, ClassNotFoundException {
 
 		Path out = new Path(args[0]);
 		Path outJob1 = new Path(out + "_job1_users");
@@ -40,36 +39,48 @@ public class Main {
 		Configuration conf = new Configuration(true);
 
 		JobWrapper job1 = job1(conf, userPath, outJob1);
+
+		
 		JobWrapper job2 = job2(conf, outJob1, postPath, outJob2);
-		JobWrapper job3 = job3(conf, userPath, postPath, commentsPath,
-				bagesPath, outJob3);
-		if (job3.waitFor(job2.waitFor(job1)).isSuccessful()) {
-			;
+		JobWrapper job3 = job3(conf, userPath, postPath, commentsPath, bagesPath, outJob3);
+		
+		job1.submit();
+		while(!job1.isComplete()){
+			Thread.sleep(1000);
+		}
+		
+	
+		job3.submit();
+		while(!job3.isComplete() ){
+			Thread.sleep(1000);
+		}
+		
+		if (job3.isSuccessful()) {
 			System.exit(0);
-		}else{
+		} else {
 			System.exit(1);
-			
+
 		}
 
 	}
 
-	public static JobWrapper job1(Configuration conf, Path userXMLPath, Path out)
+	public static JobWrapper job1(Configuration conf, Path userPath, Path out)
 			throws IOException, ClassNotFoundException, InterruptedException {
 		FileSystem.get(conf).delete(out, true);
 
 		// Create job
 		JobWrapper job1 = new JobWrapper(conf, "job1");
-		job1.setJarByClass(UserMapper.class);
+		job1.setJarByClass(UserFilteringMapper.class);
 
 		// Setup Map
-		job1.setMapperClass(UserMapper.class);
+		job1.setMapperClass(UserFilteringMapper.class);
 		job1.setNumReduceTasks(0);
 
 		// Specify key / value
 		job1.setOutputKeyClass(Text.class);
 		job1.setOutputValueClass(Text.class);
 
-		FileInputFormat.addInputPath(job1, userXMLPath);
+		FileInputFormat.addInputPath(job1, userPath);
 		job1.setInputFormatClass(TextInputFormat.class);
 
 		// Output
@@ -80,9 +91,8 @@ public class Main {
 
 	}
 
-	public static JobWrapper job2(Configuration conf, Path user, Path post,
-			Path out) throws IOException, ClassNotFoundException,
-			InterruptedException {
+	public static JobWrapper job2(Configuration conf, Path user, Path post, Path out)
+			throws IOException, ClassNotFoundException, InterruptedException {
 		FileSystem.get(conf).delete(out, true);
 
 		// Create job
@@ -90,11 +100,9 @@ public class Main {
 		job2.setJarByClass(JoinUserMapper.class);
 
 		// Setup MapReduce
-		MultipleInputs.addInputPath(job2, user, TextInputFormat.class,
-				JoinUserMapper.class);
-		MultipleInputs.addInputPath(job2, post, TextInputFormat.class,
-				JoinPostMapper.class);
-		//job2.setCombinerClass(JoinUserPostReducer.class);
+		MultipleInputs.addInputPath(job2, user, TextInputFormat.class, JoinUserMapper.class);
+		MultipleInputs.addInputPath(job2, post, TextInputFormat.class, JoinPostMapper.class);
+		// job2.setCombinerClass(JoinUserPostReducer.class);
 		job2.setReducerClass(JoinUserPostReducer.class);
 		job2.setNumReduceTasks(1);
 
@@ -109,24 +117,21 @@ public class Main {
 		return job2;
 	}
 
-	public static JobWrapper job3(Configuration conf, Path user, Path post,
-			Path comment, Path badge, Path out) throws IOException,
-			ClassNotFoundException, InterruptedException {
+	public static JobWrapper job3(Configuration conf, Path user, Path post, Path comment, Path badge, Path out)
+			throws IOException, ClassNotFoundException, InterruptedException {
 		FileSystem.get(conf).delete(out, true);
 		// Create job
 		JobWrapper job3 = new JobWrapper(conf, "job3");
-		job3.setJarByClass(UserXPostMapper.class);
+		job3.setJarByClass(UserFilteringMapper.class);
 
 		// Setup MapReduce
-		MultipleInputs.addInputPath(job3, post, TextInputFormat.class,
-				UserXPostMapper.class);
-		MultipleInputs.addInputPath(job3, comment, TextInputFormat.class,
-				UserXCommentMapper.class);
-		MultipleInputs.addInputPath(job3, badge, TextInputFormat.class,
-				UserXBadgesMapper.class);
-		// job3Join.setNumReduceTasks(0);
-		// job3Join.setReducerClass(UserXPostCombiner.class);
-		// job3Join.setNumReduceTasks(1);
+		MultipleInputs.addInputPath(job3, user, TextInputFormat.class, UserMapper.class);
+		MultipleInputs.addInputPath(job3, post, TextInputFormat.class, UserXPostMapper.class);
+		MultipleInputs.addInputPath(job3, comment, TextInputFormat.class, UserXCommentMapper.class);
+		MultipleInputs.addInputPath(job3, badge, TextInputFormat.class, UserXBadgesMapper.class);
+		
+		job3.setReducerClass(UserHistoryReducer.class);
+		job3.setNumReduceTasks(1);
 
 		// Specify key / value
 		job3.setOutputKeyClass(Text.class);

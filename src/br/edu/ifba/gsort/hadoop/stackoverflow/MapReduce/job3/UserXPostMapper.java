@@ -22,32 +22,31 @@ public class UserXPostMapper extends Mapper<Object, Text, Text, Text> {
 			throws IOException, InterruptedException {
 
 		Map<String, String> parsed = Utill.transformXmlToMap(value.toString());
-		//2010-05-28T13:43:13.617
+		
 		
 
 		String userId = parsed.get("OwnerUserId");
 		String creationDate = parsed.get("CreationDate");
 		String postId = parsed.get("Id");
-		String dia = null;
+		String ano = null;
 		
-		if (userId == null || postId == null || creationDate == null) {
+
+		if (Utill.filterIsEmptyNullable(userId,postId,creationDate)) {
 			return;
 		}
 
-		DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
-		DateFormat format2 = new SimpleDateFormat("yyyy");
-		try {
-			Date data = format.parse(creationDate);
-			dia = format2.format(data);
-		} catch (ParseException e) {
+		ano = Utill.getYear(creationDate);
+		
+		if (Utill.filterIsEmptyNullable(ano)){
 			return;
 		}
 		
-		String val = ":: POSTED: " + postId;
+		String val = "[POSTED]" + postId;
 		
-		
-		outkey.set(dia +"\t"+userId);
-		outvalue.set(val);
+
+
+		outkey.set(userId + ano);
+		outvalue.set("B" + val);
 		context.write(outkey, outvalue);
 	}
 

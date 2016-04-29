@@ -22,33 +22,29 @@ public class UserXBadgesMapper extends Mapper<Object, Text, Text, Text> {
 			throws IOException, InterruptedException {
 
 		Map<String, String> parsed = Utill.transformXmlToMap(value.toString());
-		//2010-05-28T13:43:13.617
-		
 
 		String userId = parsed.get("UserId");
 		String creationDate = parsed.get("Date");
 		String badge = parsed.get("Id");
 		String badgeName = parsed.get("Name");
-		String dia = null;
+		String ano = null;
 		
-		if (userId == null || badge == null  || badgeName == null|| creationDate == null) {
+		if (Utill.filterIsEmptyNullable(userId,badge,badgeName,creationDate)) {
 			return;
 		}
+		
+		ano = Utill.getYear(creationDate);
+		
+		if (Utill.filterIsEmptyNullable(ano)){
+			return;
+		}
+		
+		String val = "[EARN]" + badge + "["  +badgeName + "]";
+		
 
-		DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
-		DateFormat format2 = new SimpleDateFormat("yyyy");
-		try {
-			Date data = format.parse(creationDate);
-			dia = format2.format(data);
-		} catch (ParseException e) {
-			return;
-		}
-		
-		String val = ":: EARN: " + badge + "["  +badgeName + "]";
-		
-		
-		outkey.set(dia +"\t"+userId);
-		outvalue.set(val);
+
+		outkey.set(userId + ano);
+		outvalue.set("D" +val);
 		context.write(outkey, outvalue);
 	}
 

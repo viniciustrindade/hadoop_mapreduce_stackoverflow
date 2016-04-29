@@ -26,7 +26,7 @@ public class JoinPostMapper extends Mapper<Object, Text, Text, Text> {
 		}
 
 		outkey.set(userId);
-		outvalue.set(String.valueOf(1));
+		outvalue.set("B" + String.valueOf(1));
 		context.write(outkey, outvalue);
 
 	}

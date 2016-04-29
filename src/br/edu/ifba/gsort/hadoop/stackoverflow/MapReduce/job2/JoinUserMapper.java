@@ -2,10 +2,13 @@ package br.edu.ifba.gsort.hadoop.stackoverflow.MapReduce.job2;
 
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
+
+import br.edu.ifba.gsort.hadoop.common.Utill;
 
 public  class JoinUserMapper extends Mapper<Object, Text, Text, Text> {
 
@@ -16,11 +19,12 @@ public  class JoinUserMapper extends Mapper<Object, Text, Text, Text> {
 	public void map(Object key, Text value, Context context)
 			throws IOException, InterruptedException {
 
-		// Parse the input string into a nice map
-		StringTokenizer tokenizer = new StringTokenizer(value.toString(),"\t");
-		String userId = tokenizer.hasMoreTokens() ? tokenizer.nextToken() : null;
-	
+		Map<String, String> parsed = Utill.transformXmlToMap(value.toString());
 		
+		final String userId = parsed.get("Id");
+		final String location = parsed.get("Location");
+		final String displayName = parsed.get("DisplayName");
+
 		if (userId == null) {
 			return;
 		}
@@ -29,7 +33,7 @@ public  class JoinUserMapper extends Mapper<Object, Text, Text, Text> {
 		outkey.set(userId);
 
 		// Flag this record for the reducer and then output
-		outvalue.set("A" + value.toString());
+		outvalue.set("A" + displayName.toString());
 		context.write(outkey, outvalue);
 	}
 }
