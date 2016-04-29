@@ -65,9 +65,9 @@ public class UserHistoryReducer extends Reducer<Text, Text, Text, Text> {
 					retorno += Utill.SEPARADOR +  D;
 				}
 			}
-			if (!Utill.filterIsEmptyNullable(retorno)){
+	
 				context.write(new Text(A), new Text(retorno));
-			}
+	
 		}
 
 	

@@ -49,13 +49,14 @@ public class Main {
 			Thread.sleep(1000);
 		}
 		
-	
+		job2.submit();
 		job3.submit();
-		while(!job3.isComplete() ){
+	
+		while(!job2.isComplete()  || !job3.isComplete() ){
 			Thread.sleep(1000);
 		}
 		
-		if (job3.isSuccessful()) {
+		if (job2.isSuccessful() && job3.isSuccessful()) {
 			System.exit(0);
 		} else {
 			System.exit(1);
