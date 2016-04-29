@@ -1,4 +1,3 @@
-mvn clean install
 ./install/hadoop/bin/hadoop \
 jar \
 target/Hadoop-0.0.1-SNAPSHOT.jar \

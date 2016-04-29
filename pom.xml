@@ -100,7 +100,23 @@
 					<target>1.7</target>
 				</configuration>
 			</plugin>
-			
+			<plugin>
+			    <groupId>org.codehaus.mojo</groupId>
+			    <artifactId>exec-maven-plugin</artifactId>
+			    <version>1.1.1</version>
+			    <executions>
+			      <execution>
+			        <id>some-execution</id>
+			        <phase>package</phase>
+			        <goals>
+			          <goal>exec</goal>
+			        </goals>
+			      </execution>
+			    </executions>
+			    <configuration>
+			      <executable>run.sh</executable>
+			    </configuration>
+			  </plugin>
 		</plugins>
 	</build>
 
