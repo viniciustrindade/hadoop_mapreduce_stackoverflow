@@ -5,10 +5,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
-public class Utill {
+public class Utility {
 	public static String SEPARADOR = "\t";
 	
 	public static Map<String, String> transformXmlToMap(String xml) {
@@ -65,5 +64,11 @@ public class Utill {
 				return true;
 		}
 		return false;
+	}
+	
+	public static boolean filterIsEnqualIgnoreCase(String object1,String object2){
+
+			
+			return !filterIsEmptyNullable(object1,object2) && object1.toLowerCase().contains(object2);
 	}
 }

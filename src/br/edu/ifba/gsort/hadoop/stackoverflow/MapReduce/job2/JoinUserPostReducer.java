@@ -33,7 +33,7 @@ public class JoinUserPostReducer extends Reducer<Text, Text, Text, Text> {
 	public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
 
 
-		// Clear our lists
+		// Clear our listsComparable
 		listA.clear();
 		listB.clear();
 

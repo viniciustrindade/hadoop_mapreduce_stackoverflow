@@ -6,14 +6,16 @@ import java.util.Comparator;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import org.apache.commons.io.output.NullWriter;
+import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 
 import com.sun.tools.corba.se.idl.toJavaPortable.Util;
 
-import br.edu.ifba.gsort.hadoop.common.Utill;
+import br.edu.ifba.gsort.hadoop.common.Utility;
 
-public class UserHistoryReducer extends Reducer<Text, Text, Text, Text> {
+public class UserHistoryReducer extends Reducer<Text, Text, NullWritable, Text> {
 
 
 	private ArrayList<String> listA = new ArrayList<String>();
@@ -47,28 +49,34 @@ public class UserHistoryReducer extends Reducer<Text, Text, Text, Text> {
 			}
 		}
 		
-		for (String A : listA) {
+
 			String retorno = "";
 					
+			if (!listA.isEmpty()) {
+				for (String A : listA) {
+					retorno += Utility.SEPARADOR + A;
+				}
+			}
+			
 			if (!listB.isEmpty()) {
 				for (String B : listB) {
-					retorno += Utill.SEPARADOR + B;
+					retorno += Utility.SEPARADOR + B;
 				}
 			}
 			if (!listC.isEmpty()) {
 				for (String C : listC) {
-					retorno += Utill.SEPARADOR +  C;
+					retorno += Utility.SEPARADOR +  C;
 				}
 			}
 			if (!listD.isEmpty()) {
 				for (String D : listD) {
-					retorno += Utill.SEPARADOR +  D;
+					retorno += Utility.SEPARADOR +  D;
 				}
 			}
 	
-				context.write(new Text(A), new Text(retorno));
+				context.write(NullWritable.get(), new Text(retorno));
 	
-		}
+	
 
 	
 

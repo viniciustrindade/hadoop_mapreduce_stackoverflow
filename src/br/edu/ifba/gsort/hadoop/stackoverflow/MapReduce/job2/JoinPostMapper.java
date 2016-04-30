@@ -7,7 +7,7 @@ import java.util.TreeMap;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
-import br.edu.ifba.gsort.hadoop.common.Utill;
+import br.edu.ifba.gsort.hadoop.common.Utility;
 
 public class JoinPostMapper extends Mapper<Object, Text, Text, Text> {
 
@@ -18,10 +18,10 @@ public class JoinPostMapper extends Mapper<Object, Text, Text, Text> {
 	public void map(Object key, Text value, Context context)
 			throws IOException, InterruptedException {
 
-		Map<String, String> parsed = Utill.transformXmlToMap(value.toString());
+		Map<String, String> parsed = Utility.transformXmlToMap(value.toString());
 
 		String userId = parsed.get("OwnerUserId");
-		if (userId == null) {
+		if (Utility.filterIsEmptyNullable(userId)) {
 			return;
 		}
 

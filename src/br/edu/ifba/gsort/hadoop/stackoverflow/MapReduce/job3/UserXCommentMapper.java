@@ -10,7 +10,7 @@ import java.util.Map;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
-import br.edu.ifba.gsort.hadoop.common.Utill;
+import br.edu.ifba.gsort.hadoop.common.Utility;
 
 public class UserXCommentMapper extends Mapper<Object, Text, Text, Text> {
 
@@ -21,7 +21,7 @@ public class UserXCommentMapper extends Mapper<Object, Text, Text, Text> {
 	public void map(Object key, Text value, Context context)
 			throws IOException, InterruptedException {
 
-		Map<String, String> parsed = Utill.transformXmlToMap(value.toString());
+		Map<String, String> parsed = Utility.transformXmlToMap(value.toString());
 
 
 		String userId = parsed.get("UserId");
@@ -33,13 +33,13 @@ public class UserXCommentMapper extends Mapper<Object, Text, Text, Text> {
 			return;
 		}
 
-		if (Utill.filterIsEmptyNullable(userId,commentId,creationDate)) {
+		if (Utility.filterIsEmptyNullable(userId,commentId,creationDate)) {
 			return;
 		}
 		
-		ano = Utill.getYear(creationDate);
+		ano = Utility.getYear(creationDate);
 		
-		if (Utill.filterIsEmptyNullable(ano)){
+		if (Utility.filterIsEmptyNullable(ano)){
 			return;
 		}
 		String val = "[COMMENTED]" + commentId;
@@ -47,7 +47,7 @@ public class UserXCommentMapper extends Mapper<Object, Text, Text, Text> {
 
 
 		outkey.set(userId + ano);
-		outvalue.set("C" +val);
+		outvalue.set("C" + Utility.SEPARADOR  + ano  + Utility.SEPARADOR + val);
 		context.write(outkey, outvalue);
 	}
 

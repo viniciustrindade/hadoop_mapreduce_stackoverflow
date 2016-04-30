@@ -42,6 +42,8 @@ public class Main {
 
 		
 		JobWrapper job2 = job2(conf, outJob1, postPath, outJob2);
+		
+		
 		JobWrapper job3 = job3(conf, userPath, postPath, commentsPath, bagesPath, outJob3);
 		
 		job1.submit();
@@ -104,7 +106,7 @@ public class Main {
 		MultipleInputs.addInputPath(job2, user, TextInputFormat.class, JoinUserMapper.class);
 		MultipleInputs.addInputPath(job2, post, TextInputFormat.class, JoinPostMapper.class);
 		// job2.setCombinerClass(JoinUserPostReducer.class);
-		job2.setReducerClass(JoinUserPostReducer.class);
+		job2.setReducerClass(JoinUserPostReducer.class);	
 		job2.setNumReduceTasks(1);
 
 		// Specify key / value

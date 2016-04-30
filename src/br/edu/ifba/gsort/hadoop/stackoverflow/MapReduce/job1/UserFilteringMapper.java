@@ -7,12 +7,12 @@ import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
-import br.edu.ifba.gsort.hadoop.common.Utill;
+import br.edu.ifba.gsort.hadoop.common.Utility;
 
-public class UserFilteringMapper extends Mapper<Object, Text, NullWritable, Text> {
+public class UserFilteringMapper extends
+		Mapper<Object, Text, NullWritable, Text> {
 
 	private Text outUserId = new Text();
-	
 
 	@Override
 	protected void setup(
@@ -24,23 +24,19 @@ public class UserFilteringMapper extends Mapper<Object, Text, NullWritable, Text
 	public void map(Object key, Text value, Context context)
 			throws IOException, InterruptedException {
 
-		Map<String, String> parsed = Utill.transformXmlToMap(value.toString());
+		Map<String, String> parsed = Utility.transformXmlToMap(value.toString());
 
 		final String userId = parsed.get("Id");
 		final String location = parsed.get("Location");
-		final String displayName = parsed.get("DisplayName");
 
-		if (userId == null ||
-				location == null ||
-						displayName == null || 
-						(!location.toLowerCase().contains("brasil") && 
-						!location.toLowerCase().contains("brazil"))){
+		if (Utility.filterIsEmptyNullable(userId, location)
+				|| (!Utility.filterIsEnqualIgnoreCase(location,"brasil") 
+				&& !Utility.filterIsEnqualIgnoreCase(location,"brazil"))
+			) {
 			return;
 		}
 		outUserId.set(userId);
 		context.write(NullWritable.get(), value);
 	}
-
-
 
 }
